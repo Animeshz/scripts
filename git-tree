@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+help() {
+    if [ -n "$1" ]; then
+        >&2 echo
+        >&2 echo "$(basename "$0") -- Prints tree of files tracked with yadm/git"
+        >&2 echo "usage: [--root tree_root_name] <tree command options>"
+        exit 1
+    else
+        echo "$(basename "$0") -- Prints tree of files tracked with yadm/git"
+        echo "usage: [--root tree_root_name] <tree command options>"
+        exit 0
+    fi
+}
+
+command -v tree 1> /dev/null || { echo "Please install tree and try again"; exit 1; }
+
+PARAMS=()
+while (( "$#" )); do
+  case "$1" in
+    --help) help;shift;;
+    --root) ROOT="$2";shift;shift;;
+    *) PARAMS+=("$1");shift;;
+  esac
+done
+eval set -- "$PARAMS[@]"
+
+out=$(eval "$(command -v yadm || command -v git)" ls-files | tree --fromfile "${PARAMS[@]}") || help 'err'
+
+if [[ -n $ROOT ]]; then
+    printf %s "$out" | sed "1s/.*/$ROOT/"
+else
+    printf %s "$out"
+fi
+

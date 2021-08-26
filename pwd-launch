@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+ARGS=("$@")
+cmd_exists() {
+    command -v "$1" 1> /dev/null
+}
+fallback() {
+    exec "${ARGS[@]}"
+}
+
+cmd_exists xprop || fallback
+cmd_exists pgrep || fallback
+cmd_exists readlink || fallback
+
+wid=$(xprop -root -f _NET_ACTIVE_WINDOW 0x ' $0\n' _NET_ACTIVE_WINDOW | cut -d ' ' -f 2)
+[[ $wid -ne '0x0' ]] || fallback
+
+pid=$(xprop -root -f _NET_WM_PID 0c ' $0\n' -id $wid _NET_WM_PID | cut -d ' ' -f 2)
+child_pid="$pid"
+child_procs=$(pgrep -P "$pid")
+if [[ $(wc -l <<< "$child_procs") -eq 1 ]]; then
+    child_pid="$child_procs"
+fi
+
+child_pwd=$(readlink -f "/proc/$child_pid/cwd") || fallback
+exec "$@" "$child_pwd"

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [[ $EUID -ne 0 ]]; then
+  >&2 echo "This script must be run as root"
+  exit 1
+fi
+
+OS_INDICATION_SUPPORTED_FILE='/sys/firmware/efi/efivars/OsIndicationsSupported-8be4df61-93ca-11d2-aa0d-00e098032b8c'
+OS_INDICATION_FILE='/sys/firmware/efi/efivars/OsIndications-8be4df61-93ca-11d2-aa0d-00e098032b8c'
+BUFFER_ATTR=7 # EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
+
+[[ -f $OS_INDICATION_SUPPORTED_FILE && "$(( $(od -An -t u8 --read-bytes=8 --skip-bytes=4 < $OS_INDICATION_SUPPORTED_FILE) & 1))" -eq 1 ]] || {
+  >&2 echo "OsIndications is not supported"
+  exit 1
+}
+
+DATA="$([[ -f $OS_INDICATION_FILE ]] && od -An -t u8 --read-bytes=8 --skip-bytes=4 < $OS_INDICATION_FILE || echo '0')"
+DATA=$(( DATA | 1 ))  # EFI_OS_INDICATIONS_BOOT_TO_FW_UI
+
+BUFFER="$(printf '%08x' $BUFFER_ATTR | sed -r -e 's/(..)(..)(..)(..)/\\x\4\\x\3\\x\2\\x\1/')$(printf '%016x' $DATA | sed -r -e 's/(..)(..)(..)(..)(..)(..)(..)(..)/\\x\8\\x\7\\x\6\\x\5\\x\4\\x\3\\x\2\\x\1/')"
+printf %b "$BUFFER" > $OS_INDICATION_FILE
+reboot
