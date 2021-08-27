@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Finds and appends pwd of currently focused window using EWMH to the given command
+
 ARGS=("$@")
 cmd_exists() {
     command -v "$1" 1> /dev/null

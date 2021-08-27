@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Reboots into BIOS/UEFI firmware setup
+# inspired by 'systemd --reboot-firmware'
+
 if [[ $EUID -ne 0 ]]; then
   >&2 echo "This script must be run as root"
   exit 1

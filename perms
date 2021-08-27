@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Prints out permissions of the given files in octal format
+
+stat -c "%a %n" "$@"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Prints out tree of yadm/git tracked files
+
 help() {
     if [ -n "$1" ]; then
         >&2 echo
@@ -23,13 +25,10 @@ while (( "$#" )); do
     *) PARAMS+=("$1");shift;;
   esac
 done
-eval set -- "$PARAMS[@]"
+eval set -- "${PARAMS[@]}"
 
 out=$(eval "$(command -v yadm || command -v git)" ls-files | tree --fromfile "${PARAMS[@]}") || help 'err'
-
 if [[ -n $ROOT ]]; then
-    printf %s "$out" | sed "1s/.*/$ROOT/"
-else
-    printf %s "$out"
+    out=$(sed "1s/.*/$ROOT/" <<< "$out")
 fi
-
+printf %s "$out"
