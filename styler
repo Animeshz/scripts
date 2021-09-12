@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+declare -A unicodes=(
+  # fixup indexing, few symbols missing...
+  ['superscript']="!\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᵠᴿˢᵀᵁⱽᵂˣʸᶻ[\\]^_\`ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖᵠʳˢᵗᵘᵛʷˣʸᶻ{|}~"
+)
+
+help() {
+  self_name="$(basename "$0")"
+  echo "$self_name -- Styles the given text into unicode format"
+  echo "usage:"
+  echo "  $self_name FORMAT INPUT_TEXT"
+  echo "  echo 'something' | $self_name FORMAT"
+  echo
+  echo "Available formats:"
+
+  for unicode in "${!unicodes[@]}"; do
+    echo "  $unicode - ${unicodes[$unicode]}"
+  done
+}
+
+if [[ "$#" != 2 ]]; then
+  if [[ ! -t 0 && "$#" == 1 ]]; then :;
+  elif [[ "$#" == 0 ]]; then help; exit 0;
+  else >&2 echo "Must provide 2 arguments (not $#) (one can be from stdin), see '$(basename "$0") --help' for more info."; exit 1;
+  fi
+fi
+
+# Faster lookup with hashmap compared to on-time printf calls (printf "%d" "'$character")
+declare -A ord
+for (( i=32; i<127; i++ )); do ord["$(printf '%b' $(printf '\\x%x' $i))"]="$i"; done
+
+unicode=${unicodes[$1]}
+if [[ -z $unicode ]]; then
+  echo "$2"
+  exit 0
+fi
+
+# Read from $2 if present or else from pipe of another command (prechecked before) without bufferring,
+# so non-ending input sequence will work
+{ [[ -n "$2" ]] && echo "$2" || cat -; } | \
+  while read line; do
+    for (( i=0; i<${#line}; i++ )); do
+      char="${line:$i:1}"
+      charcode=${ord[$char]}
+  
+      # Faster to just echo than to store it in result variable and concat at each step
+      if (( charcode > 32 && charcode < 127 )); then
+        echo -n ${unicode:$((charcode-33)):1}
+      else
+        echo -n "$char"
+      fi
+    done
+    printf '\n'
+  done
+
