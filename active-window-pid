@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Finds pid of currently focused window using EWMH
+
+require() {
+    command -v "$1" 1>/dev/null || { >&2 echo "Error: $1 is not installed";exit 1; }
+}
+
+require xprop
+
+wid=$(xprop -root -f _NET_ACTIVE_WINDOW 0x ' $0\n' _NET_ACTIVE_WINDOW | cut -d ' ' -f 2)
+[[ $wid -ne '0x0' ]] || fallback
+
+pid=$(xprop -root -f _NET_WM_PID 0c ' $0\n' -id $wid _NET_WM_PID | cut -d ' ' -f 2)
+
+echo $pid
