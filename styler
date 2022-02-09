@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Styles the text to different styles (like superscript), run with --help to know more
+
 declare -A unicodes=(
   # fixup indexing, few symbols missing...
   ['superscript']="!\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᵠᴿˢᵀᵁⱽᵂˣʸᶻ[\\]^_\`ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖᵠʳˢᵗᵘᵛʷˣʸᶻ{|}~"
@@ -43,7 +45,7 @@ fi
     for (( i=0; i<${#line}; i++ )); do
       char="${line:$i:1}"
       charcode=${ord[$char]}
-  
+
       # Faster to just echo than to store it in result variable and concat at each step
       if (( charcode > 32 && charcode < 127 )); then
         echo -n ${unicode:$((charcode-33)):1}
