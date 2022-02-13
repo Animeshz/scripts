@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# A simple script to automate installation of dependencies and enable cross-chroot environment
+
+if [[ $EUID -ne 0 ]]; then
+  >&2 echo "This script must be run as root"
+  exit 1
+fi
+
+if [[ $# != 2 ]]; then
+    >&2 echo "Usage: $(basename "$0") <NEWROOT> <QEMU-ARCHITECTURE-STATIC>"
+    >&2 echo "Chroot with root directory set to NEWROOT."
+    >&2 echo "Find possible values for QEMU-ARCHITECTURE-STATIC from 'xbps-query -Rf qemu-user-static'"
+    exit 1
+fi
+mount_path="${1%/}"
+qemu_emu="$(which $2)"
+
+xbps-install qemu qemu-user-static binfmt-support
+ln -sf /etc/sv/binfmt-support /var/service
+update-binfmts --enable
+# update-binfmts --display | grep aarch
+
+# To be done by the user
+#mount /dev/sda2 /mnt/rpi
+#mount /dev/sda1 /mnt/rpi/boot -o rw,uid=(id -u),gid=(id -g)
+for i in /sys /proc /dev; do mount --rbind "$i" "$mount_path$i"; done
+[[ ! -f "$mount_path/$qemu_emu" ]] && cp "$qemu_emu" "$mount_path/$qemu_emu"
+
+chroot "$mount_path"
+
+for i in /sys /proc /dev; do until umount -R "$mount_path$i"; do sleep 1; done; done
+# umount -R "$mount_path"

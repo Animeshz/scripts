@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Shows file only in first dir and not in other
+
+require() {
+    command -v "$1" 1>/dev/null || { >&2 echo "Error: $1 is not installed";exit 1; }
+}
+
+require fd
+
+cd "$1"
+fd -x sh -c "[ -e '$2/{}' ] || echo {}" 2>/dev/null
