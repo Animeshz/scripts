@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+fd -td -d1 \
+| while read dir; do
+    printf "\033[36m%-30s\033[0m %s\n" "${dir#./}" "$(cat "$dir/README.md" | grep "^###" | head -n 1 | cut -d" " -f2-)"
+    readarray -t files < <(fd -tx . $dir | xargs -I{} basename {})
+    for ((i=0; i<$((${#files[@]}-1)); ++i)); do
+      file="${files[i]}"
+      printf "├─ \033[36m%-30s\033[0m %s\n" "$file" "$(cat "$dir/$file" | grep "^#[^!]" | head -n 1 | cut -d" " -f2-)"
+    done
+
+    if [[ ${#files[@]} > 0 ]]; then
+      file="${files[i]}"
+      printf "└─ \033[36m%-30s\033[0m %s\n" "$file" "$(cat "$dir/$file" | grep "^#[^!]" | head -n 1 | cut -d" " -f2-)"
+    fi
+    echo
+  done

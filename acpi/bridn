@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Down the brightness by given value or else 2
+
+delta=${1:-2}
+brillo -U $delta

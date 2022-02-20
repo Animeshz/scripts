@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep (s3) sleep mode
+# Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep sleep (s3) mode
 
 original_sleep=$(cat /sys/power/mem_sleep | awk -F '[][]' '{print $2}')
 
