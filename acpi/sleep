@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep (s3) sleep mode
+
+original_sleep=$(cat /sys/power/mem_sleep | awk -F '[][]' '{print $2}')
+
+sleep_time=3600  # 1 hour
+echo s2idle > /sys/power/mem_sleep
+
+start_time=$(date +%s)
+rtcwake -u -s $sleep_time -m mem
+
+end_time=$(date +%s)
+if [ $(( end_time - start_time + 2 )) -gt $sleep_time ]; then
+    echo deep > /sys/power/mem_sleep
+    zzz
+fi
+
+echo $original_sleep > /sys/power/mem_sleep

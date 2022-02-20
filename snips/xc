@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Runs xtools/xchroot with some predefined stuffs
+
+TERM=linux sudo xchroot "$(realpath "$1")" "${2:-bash}"

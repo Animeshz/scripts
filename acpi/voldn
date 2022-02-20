@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Up the vol by given value or else 2
+
+delta=${1:-2}
+pactl set-sink-volume @DEFAULT_SINK@ -${delta}%

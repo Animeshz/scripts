@@ -24,7 +24,6 @@ active-window-pid              Finds pid of currently focused window using EWMH
 cloc-git                       Counts lines of code in a git repository
 extarrange                     Arranges the files by grouping them into folder of their extension name
 git-tree                       Prints out tree of yadm/git tracked files
-ocr                            Copies text anywhere over the screen.
 perms                          Prints out permissions of the given files in octal format
 pwd-launch                     Finds and appends pwd of currently focused window using EWMH to the given command
 reboot-firmware                Reboots into BIOS/UEFI firmware setup
