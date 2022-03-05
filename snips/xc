@@ -2,4 +2,5 @@
 
 # Runs xtools/xchroot with some predefined stuffs
 
+# Prequisite to run: sudo cp (which qemu-<arch>-static) /mnt/rpi/usr/bin
 TERM=linux sudo xchroot "$(realpath "$1")" "${2:-bash}"

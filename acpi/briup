@@ -3,4 +3,4 @@
 # Up the brightness by given value or else 2
 
 delta=${1:-2}
-brillo -A delta
+brillo -A $delta
