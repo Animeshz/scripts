@@ -3,4 +3,4 @@
 # Emits a generic event to move to next song/video using playerctl
 # Requires WM to be launched using dbus-launch
 
-playerctl prev
+playerctl previous
