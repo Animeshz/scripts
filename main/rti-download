@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+
+# QuickMulti RTI Downloader
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+import argparse
+import re
+import shutil
+import time
+import os
+
+
+def pass_intermediate_page(link, wait):
+    link.click()
+    browser.switch_to.window(browser.window_handles[-1])
+
+    WebDriverWait(browser, wait).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#landing img')))
+    browser.execute_script('document.body.removeAttribute("class");')  # Remove any onclick disabler (in adblocker detected)
+    click_to_continue = browser.find_element(By.CSS_SELECTOR, '#landing img')
+    browser.execute_script('arguments[0].scrollIntoView();', click_to_continue);  # Fix for other elements may be clickable at (x,y)
+    click_to_continue.click()
+
+    WebDriverWait(browser, wait).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#landing img#pleasewait')))
+    WebDriverWait(browser, wait).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '#landing img#pleasewait')))
+    browser.execute_script('document.body.removeAttribute("class");')
+    generate_link = browser.find_element(By.CSS_SELECTOR, '#landing a#generater')
+    browser.execute_script('arguments[0].scrollIntoView();', generate_link);
+    generate_link.click()
+
+    WebDriverWait(browser, wait).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'img#pleasewaits')))
+    WebDriverWait(browser, wait).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, 'img#pleasewaits')))
+    show_link = browser.find_element(By.CSS_SELECTOR, 'img#showlink')
+    show_link.click()
+
+    browser.close()
+    browser.switch_to.window(browser.window_handles[-1])
+
+def extract_video_link(wait):
+    download_btn = browser.find_element(By.XPATH, '//a[@class="rti_btn" and contains(text(), "Get Download Link")]')
+    download_btn.click()
+
+    WebDriverWait(browser, wait).until(EC.presence_of_element_located((By.XPATH, '//iframe[@height="100%" and @width="100%"]')))
+    browser.switch_to.frame(browser.find_element(By.XPATH, '//iframe[@height="100%" and @width="100%"]'))
+    generate_link = browser.find_element(By.CSS_SELECTOR, 'button#download')
+    generate_link.click()
+
+    WebDriverWait(browser, wait).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'button#download.is-loading')))
+    WebDriverWait(browser, wait).until_not(EC.presence_of_element_located((By.CSS_SELECTOR, 'button#download.is-loading')))
+    download_buttons = browser.find_elements(By.CSS_SELECTOR, '#downloads a')
+
+
+    qualities = [x.get_attribute('innerHTML') for x in download_buttons][::-1]
+    download_links = [x.get_attribute('href') for x in download_buttons][::-1]
+
+    browser.close()
+    return qualities, download_links
+
+
+def require(name):
+    abs_path = shutil.which(name)
+    if not abs_path:
+        print(f'Required binary {name} does not exist in the system.')
+        exit(1)
+    return abs_path
+
+def url_parse(string):
+    m = re.match(r'^(?:(?:(?:https://)?www.)?rtilinks.com/archives/)?(\d+)$', string)
+    if not m:
+        raise argparse.ArgumentTypeError("Invalid link of rtilink download list, input either id in digit or full link following rtilinks.com")
+
+    return m.group(1)
+
+def parse_range(string):
+    m = re.match(r'^(\d+)(?:-(\d+))?$', string)
+    if not m:
+        raise argparse.ArgumentTypeError("'" + string + "' is not a range of number. Expected forms like '0-5' or '2'.")
+    start = m.group(1)
+    end = m.group(2) or start
+    return (int(start,10), int(end,10)+1)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='QuickMulti RTI Downloader', usage='rti-download [-h] [-r RANGE] [-q [PREFERRED_QUALITIES ...]] -- <url|id>')
+    parser.add_argument('url_id', type=url_parse, metavar='<url|id>', help='rtilink archive url from where to download')
+    parser.add_argument('-r', '--range', type=parse_range, help='range of videos to download, indexed from 1, e.g. 1-5')
+    parser.add_argument('-q', '--preferred-qualities', type=str, nargs='*', help='moves given qualities to highest in preference order, by default higher to lower is preferred')
+    args = parser.parse_args()
+
+    wget = require('wget')
+    brave = require('brave-browser-stable')
+    preferred_qualities = args.preferred_qualities
+
+    option = webdriver.ChromeOptions()
+    option.binary_location = brave
+    browser = webdriver.Chrome(options=option)
+    main_window = browser.window_handles[0]
+
+    browser.get(f'https://www.rtilinks.com/archives/{args.url_id}')
+    links = browser.find_elements(By.CSS_SELECTOR, '.entry-content a')
+
+    min, max = args.range if args.range else (1, len(links)+1)
+    pad = len(str(len(links)))
+    for rel_idx, link in enumerate(links[min-1:max-1]):
+        num = min + rel_idx
+        pass_intermediate_page(link, wait=60)
+        qualities, download_links = extract_video_link(wait=60)
+
+        # pull preferred qualities in front
+        movable_index = [qualities.index(q) for q in preferred_qualities if q in qualities]
+        qualities = [qualities.pop(i) for i in movable_index] + qualities
+        download_links = [download_links.pop(i) for i in movable_index] + download_links
+
+        os.system(f'{wget} -c {download_links[0]} -O E{str(num).zfill(pad)}-{qualities[0]}.mp4')
+        browser.switch_to.window(main_window)
+
+    browser.close()
