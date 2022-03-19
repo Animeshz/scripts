@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Shows list of manually installed packages sorted by name (default) or date (-d) of installation
+
+tmp=$(mktemp); xbps-query -m > ${tmp}
+
+list=$(cat ${tmp})
+[[ $1 = '-d' ]] && list=$(xilog | grep -f ${tmp} | cut -d: -f1)
+rm ${tmp}
+
+echo $list | xargs -n1 xbps-uhelper getpkgname

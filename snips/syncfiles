@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Just copies the absolute path to the ~/.config/yadm/files
+
+abs_path=$(realpath "$1")
+target_dir="$HOME/.config/yadm/files$(dirname "$abs_path")"
+
+mkdir -p $target_dir
+rsync -avP "$abs_path" "$target_dir"
