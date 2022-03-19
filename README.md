@@ -5,13 +5,13 @@ This is a collection of my regularly used scripts.
 
 ## Getting Started
 
-Simply clone the repo and add it to the `$PATH`.
+Simply clone the repo and add its subdirs to the `$PATH`.
 
 ```bash
 test -d ~/.scripts || git clone https://github.com/Animeshz/scripts ~/.scripts
 
 nvim {.bashrc,.zshrc,.config/fish/config.fish}
-# add $HOME/.scripts to $PATH
+# add `fd -td -d1 . ~/.scripts 2>/dev/null || find ~/.scripts -type d -maxdepth 1` to $PATH
 ```
 
 
@@ -32,6 +32,7 @@ acpi                           Scripts for handling acpi events from /etc/acpi/h
 └─ volup                          Down the vol by given value or else 2
 
 bootstrapping                  Bootstrapping Scripts
+└─ rpi-repeater                   Setup raspberry pi as a wifi-repeater (Ext-Dongle: client, Inbuilt: AP)
 
 main                           The Main (Actual) scripts for productivity
 ├─ active-window-pid              Finds pid of currently focused window using EWMH
