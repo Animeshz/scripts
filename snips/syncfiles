@@ -1,9 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Just copies the absolute path to the ~/.config/yadm/files
 
-abs_path=$(realpath "$1")
-target_dir="$HOME/.config/yadm/files$(dirname "$abs_path")"
+if [[ $1 = '-S' ]]; then
+    cd "$HOME/.config/yadm/files"
+    fd -tf | xargs -I{} sh -c 'syncfiles /{}'
+else
+    abs_path=$(realpath "$1")
+    target_dir="$HOME/.config/yadm/files$(dirname "$abs_path")"
 
-mkdir -p $target_dir
-rsync -avP "$abs_path" "$target_dir"
+    mkdir -p $target_dir
+    rsync -avP "$abs_path" "$target_dir"
+fi
