@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Generates correct dpi for the screen, outputs in format of /etc/X11/xorg.conf.d
+# Example: gen-monitor-dpi 13.5 | sudo dd of=/etc/X11/xorg.conf.d/90-monitor.conf
+
+require() {
+    command -v "$1" 1>/dev/null || { >&2 echo "Error: $1 is not installed"; exit 1; }
+}
+
+require xrandr
+
+if [[ $# -eq 0 ]]; then
+    >&2 echo "Usage: $(basename $0) <screen-size-in-inch> [<screen-size-in-inch> ...]"
+    exit 1
+fi
+
+xrandr \
+| awk '/ connected/{print$1,$4}' \
+| sed 's/\+.*//' \
+| awk -F'[ x]' -v ss="${*}" \
+'BEGIN { split(ss,screen_sizes,":") }
+{
+    print "Section \"Monitor\""
+    print "	Identifier \"" $1 "\""
+    print "	DisplaySize " \
+	int((screen_sizes[NR]*$2*25.4)/sqrt($2*$2+$3*$3) + 0.5) \
+	" " \
+	int((screen_sizes[NR]*$3*25.4)/sqrt($2*$2+$3*$3) + 0.5)
+    print "EndSection\n"
+}'

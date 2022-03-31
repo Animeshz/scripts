@@ -27,11 +27,13 @@ acpi                           Scripts for handling acpi events from /etc/acpi/h
 ├─ muprv                          Emits a generic event to move to next song/video using playerctl
 ├─ mute                           Toggle mute
 ├─ mutoggle                       Emits a generic event to move to next song/video using playerctl
-├─ slp                            Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep sleep (s3) mode
+├─ slp                            Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep sleep (s3) mode, and subsequently into hibernation after 2 more hours
 ├─ voldn                          Up the vol by given value or else 2
 └─ volup                          Down the vol by given value or else 2
 
 bootstrapping                  Bootstrapping Scripts
+├─ crusersv                       Creates user sv dir in ~/.local/service (preferably symlinking user services from ~/.config/sv)
+├─ gen-monitor-dpi                Generates correct dpi for the screen, outputs in format of /etc/X11/xorg.conf.d
 └─ rpi-repeater                   Setup raspberry pi as a wifi-repeater (Ext-Dongle: client, Inbuilt: AP)
 
 main                           The Main (Actual) scripts for productivity

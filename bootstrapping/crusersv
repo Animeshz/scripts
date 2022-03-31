@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Creates user sv dir in ~/.local/service (preferably symlinking user services from ~/.config/sv)
+
+if [ "$1" = '-d' ]; then
+    USER=${2:-$USER}
+    sudo rm "/etc/sv/runsvdir-$USER"
+    exit
+fi
+
+USER=${1:-$USER}
+mkdir -p "$USER/.local/service"
+
+sudo mkdir -p "/etc/sv/runsvdir-$USER"
+cat <<EOL | sudo dd of="/etc/sv/runsvdir-$USER/run"
+#!/bin/sh
+
+export USER="$USER"
+export HOME="/home/$USER"
+
+groups="\$(id -Gn "$USER" | tr ' ' ':')"
+svdir="$HOME/.local/service"
+
+exec chpst -u "$USER:\$groups" runsvdir "\$svdir"
+EOL
+
+sudo chmod +x "/etc/sv/runsvdir-$USER/run"

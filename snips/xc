@@ -2,5 +2,9 @@
 
 # Runs xtools/xchroot with some predefined stuffs
 
-# Prequisite to run: sudo cp (which qemu-<arch>-static) /mnt/rpi/usr/bin
-TERM=linux sudo xchroot "$(realpath "$1")" "${2:-bash}"
+if [ "$(id -u)" -ne 0 ]; then
+  >&2 echo "This script must be run as root"
+  exit 1
+fi
+
+TERM=linux xchroot "$(realpath "$1")" $2

@@ -7,9 +7,8 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-if [[ $# != 2 ]]; then
-    >&2 echo "Usage: $(basename "$0") <NEWROOT> <QEMU-ARCHITECTURE-STATIC>"
-    >&2 echo "Chroot with root directory set to NEWROOT."
+if [[ $# < 2 ]]; then
+    >&2 echo "Usage: $(basename "$0") <NEWROOT> <QEMU-ARCHITECTURE-STATIC> <SHELL>"
     >&2 echo "Find possible values for QEMU-ARCHITECTURE-STATIC from 'xbps-query -Rf qemu-user-static'"
     exit 1
 fi
@@ -24,10 +23,7 @@ update-binfmts --enable
 # To be done by the user
 #mount /dev/sda2 /mnt/rpi
 #mount /dev/sda1 /mnt/rpi/boot -o rw,uid=(id -u),gid=(id -g)
-for i in /sys /proc /dev; do mount --rbind "$i" "$mount_path$i"; done
-[[ ! -f "$mount_path/$qemu_emu" ]] && cp "$qemu_emu" "$mount_path/$qemu_emu"
+[[ -f "$mount_path$qemu_emu" ]] || cp "$qemu_emu" "$mount_path$qemu_emu"
 
-chroot "$mount_path"
-
-for i in /sys /proc /dev; do until umount -R "$mount_path$i"; do sleep 1; done; done
+"$(dirname ${BASH_SOURCE%/*})/snips/xc" "$mount_path" $3
 # umount -R "$mount_path"

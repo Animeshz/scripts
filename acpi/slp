@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep sleep (s3) mode, and supsequently into hibernation after 2 more hours
+# Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep sleep (s3) mode, and subsequently into hibernation after 2 more hours
 
 s2idle_sleep_time=3600  # 1 hour
 deep_sleep_time=7200    # 2 hour
