@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Reconfigures xbps packages if isn't atm
+
+xbps-query -l | grep ^uu | cut -d' ' -f 2 | xargs -r sudo xbps-reconfigure
