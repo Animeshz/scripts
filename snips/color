@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# TODO: Extend script as filter, and with string name inputs like 'blue'
+# Ref: https://github.com/ricobl/dotfiles/blob/master/bin/mass-git
+
+##################
+# Code # Color   #
+##################
+#  00  # Off     #
+#  30  # Black   #
+#  31  # Red     #
+#  32  # Green   #
+#  33  # Yellow  #
+#  34  # Blue    #
+#  35  # Magenta #
+#  36  # Cyan    #
+#  37  # White   #
+##################
+
+color() {
+    echo "\033[$1;$2m"
+}
+
+
+c_blue=$(color 1 35)
+c_off=$(color 0 00)
+echo "${c_blue}test${c_off}"
+

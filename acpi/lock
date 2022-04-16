@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Lock screen with xtrlock along with fingerprint [VERY BUGGY]
+# Original source: https://github.com/mm--/dot-sawfish/blob/master/scripts/fingerprint-xtrlock.sh
+
+"$(dirname ${BASH_SOURCE%/*})/main/active-xorg-users" | while read -r user; do
+    sudo -u $user bash -c '\
+        CURRENT_PID=$$
+        xtrlock && sudo pkill fprintd-verify && sudo kill $CURRENT_PID &
+        until sudo fprintd-verify $(whoami) | tee /dev/stderr | grep verify-match; do
+            sleep 1
+        done
+        xset dpms force on
+        sudo pkill xtrlock
+    '
+done
+
+

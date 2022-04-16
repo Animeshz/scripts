@@ -2,6 +2,6 @@
 
 # Launch quickemu vm with fuzzy search
 
-conf_file=$(fd -ai --regex "^$1.*\.conf$" ~/Projects/VM-Chroot | sk)
+conf_file=$(fd -ai --regex "$1.*\.conf$" -d1 ~/Projects/VM-Chroot/vm | sk)
 cd "$(dirname "$conf_file")"
 quickemu --vm "$conf_file" --display spice

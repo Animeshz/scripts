@@ -1,0 +1,14 @@
+#! /bin/bash
+
+# Finds all the users currently having a Xorg session active
+
+xorg_pids=$(pgrep Xorg | tr '\n' '|')
+echo $xorg_pids
+test -n "$xorg_pids" || exit 1
+dm_pid=$(ps -eo pid,ppid,args | grep "$xorg_pids" | cut -d' ' -f2)
+echo $dm_pid
+#pid_list="$(ps -eo pid,ppid,cmd | \
+#    awk -v dm_pid=$dm_pid '$2 == dm_pid {if (matchnr == 0) '\
+#'{ printf "%s%d ","$2 == ",$1; matchnr++;} '\
+#'else printf "%s%d ","|| $2 == ",$1;}')"
+#ps -eo pid,ppid,user,cmd | awk "$pid_list"'{print $3}' | uniq
