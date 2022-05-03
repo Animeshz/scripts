@@ -27,7 +27,7 @@ acpi                           Scripts for handling acpi events from /etc/acpi/h
 ├─ muprv                          Emits a generic event to move to next song/video using playerctl
 ├─ mute                           Toggle mute
 ├─ mutoggle                       Emits a generic event to move to next song/video using playerctl
-├─ slp                            Puts laptop into s2idle mode for an hour, and if no interruption occurred then put it in deep sleep (s3) mode, and subsequently into hibernation after 2 more hours
+├─ slp                            Puts laptop into s2idle(1h), deep-sleep(2h), and into hibernation if still no activity
 ├─ voldn                          Up the vol by given value or else 2
 └─ volup                          Down the vol by given value or else 2
 
@@ -47,12 +47,14 @@ main                           The Main (Actual) scripts for productivity
 └─ styler                         Styles the text to different styles (like superscript), run with --help to know more
 
 snips                          Snippets that mainly delegates the operation to other applicaitons/scripts in one-line, but used regularly.
+├─ color                          TODO: Extend script as filter, and with string name inputs like 'blue'
 ├─ dirdiff                        Shows file only in first dir and not in other
 ├─ git-cloc                       Counts lines of code in a git repository
 ├─ installed-packages             Shows list of manually installed packages sorted by name (default) or date (-d) of installation
 ├─ ocr                            Copies the text from anywhere on the screen to clipboard using tesseract-ocr
 ├─ perms                          Prints out permissions of the given files in octal format
 ├─ rec                            Records screen using ffmpeg (saves file with name if provided)
+├─ recon                          Reconfigures xbps packages if isn't atm
 ├─ syncfiles                      Just copies the absolute path to the ~/.config/yadm/files
 ├─ vml                            Launch quickemu vm with fuzzy search
 └─ xc                             Runs xtools/xchroot with some predefined stuffs

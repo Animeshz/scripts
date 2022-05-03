@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# TODO: Extend script as filter, and with string name inputs like 'blue'
+# Ref: https://github.com/ricobl/dotfiles/blob/master/bin/mass-git
+
+# E.g: color magenta && echo hello && color reset
+
+##################
+# Code # Color   #
+##################
+#  00  # Off     #
+#  30  # Black   #
+#  31  # Red     #
+#  32  # Green   #
+#  33  # Yellow  #
+#  34  # Blue    #
+#  35  # Magenta #
+#  36  # Cyan    #
+#  37  # White   #
+##################
+
+color() {
+    echo -ne "\033[$1;$2m"
+}
+
+declare -A color_mapping=(
+    ['black']=30
+    ['red']=31
+    ['green']=32
+    ['yellow']=33
+    ['blue']=34
+    ['magenta']=35
+    ['cyan']=36
+    ['white']=37
+)
+
+if [[ $1 == 'reset' ]]; then
+    color 0 00
+else
+    color 1 ${color_mapping[$1]}
+fi
+
