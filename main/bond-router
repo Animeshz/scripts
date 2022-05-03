@@ -3,6 +3,11 @@
 # Bonds all the wlan and eth interfaces (except wlan0) and creates a hotspot in wlan0
 # Prequisites: Add 'net.ifnames=0' to the kernel parameters so udev allocate devices with traditional wlan0, wlan1...
 
+# Improvement refs:
+# https://forums.raspberrypi.com/viewtopic.php?t=138730
+# https://github.com/MkLHX/AP_STA_RPI_SAME_WIFI_CHIP / https://github.com/lukicdarkoo/rpi-wifi
+# https://forums.raspberrypi.com/viewtopic.php?t=206524
+
 : ${BOND_NAME:=merge-bond}
 : ${LOCAL_GATEWAY:=192.168.24.1}
 
@@ -24,7 +29,8 @@ else
     ip link add $BOND_NAME type bond
     ip link set $BOND_NAME down
 
-    for ifc in $(ip -o link show | awk -F': ' '$2 ~ /wlan|eth/ && $2 !~ /wlan0/ {print $2}'); do
+    #for ifc in $(ip -o link show | awk -F': ' '$2 ~ /wlan|eth/ && $2 !~ /wlan0/ {print $2}'); do
+    for ifc in $(ip -o link show | awk -F': ' '$2 ~ /wlan|eth/ {print $2}'); do
         ip link set $ifc down
         ip link set $ifc master $BOND_NAME
         ip link set $ifc up
@@ -33,9 +39,11 @@ else
     ip link set $BOND_NAME up
 
     # Create AP on wlan0
-    iw phy phy0 interface add ap0 type __ap
+    #iw phy phy0 interface add ap0 type __ap
+    iw dev wlan0 interface add ap0 type __ap
     ip addr add $LOCAL_GATEWAY dev ap0
 
+    mkdir -p /etc/hostapd
     cat > /etc/hostapd/hostapd.conf <<EOF
 interface=ap0
 driver=nl80211
@@ -51,6 +59,24 @@ wpa_passphrase=iiitl@1234
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
+
+
+
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
+interface=ap0
+driver=nl80211
+ssid=IIITL-507
+hw_mode=g
+channel=11
+wmm_enabled=0
+macaddr_acl=0
+auth_algs=1
+wpa=2PASSPHRASE
+wpa_passphrase=iiitl@1234
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP CCMP
+rsn_pairwise=CCMP
 EOF
 
     cat > /etc/dnsmasq.conf <<EOF
@@ -62,10 +88,34 @@ interface=ap0
 domain-needed
 bogus-priv
 server=8.8.8.8
-${LOCAL_GATEWAY/.*/.50}
-dhcp-range=${LOCAL_GATEWAY/.*/.50},${LOCAL_GATEWAY/.*/.50},12h
+dhcp-range=${LOCAL_GATEWAY/.*/.50},${LOCAL_GATEWAY/.*/.200},12h
 dhcp-option=3,$LOCAL_GATEWAY
+
+
+
+interface=lo,ap0
+no-dhcp-interface=lo,wlan0
+bind-interfaces
+server=8.8.8.8
+domain-needed
+bogus-priv
+dhcp-range=192.168.10.50,192.168.10.150,12h
 EOF
+
+
+    cat > /etc/wpa_supplicant/wpa_supplicant.conf <<EOF
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=IN
+network={
+    ssid="V2040"
+    psk="bedeveloper"
+    id_str="AP1"
+    scan_ssid=1
+}
+EOF
+
+
 
     hostapd hostapd.conf
 fi

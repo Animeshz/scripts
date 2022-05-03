@@ -23,7 +23,7 @@ update-binfmts --enable
 # To be done by the user
 #mount /dev/sda2 /mnt/rpi
 #mount /dev/sda1 /mnt/rpi/boot -o rw,uid=(id -u),gid=(id -g)
-[[ -f "$mount_path$qemu_emu" ]] || cp "$qemu_emu" "$mount_path$qemu_emu"
+[[ -f "$mount_path$qemu_emu" ]] || touch "$mount_path$qemu_emu" && mount --bind "$qemu_emu" "$mount_path$qemu_emu"
 
 "$(dirname ${BASH_SOURCE%/*})/snips/xc" "$mount_path" $3
 # umount -R "$mount_path"
