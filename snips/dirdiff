@@ -8,5 +8,8 @@ require() {
 
 require fd
 
-cd "$1"
-fd -x sh -c "[ -e '$2/{}' ] || echo {}" 2>/dev/null
+a=$(realpath $1)
+b=$(realpath $2)
+
+cd "$a"
+fd -x sh -c "[ -e '$b/{}' ] || echo {}" 2>/dev/null
