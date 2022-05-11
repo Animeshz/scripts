@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Exports whole notion workspace in $PWD
+# Highly inspired by https://github.com/gidoBOSSftw5731/notion-auto-pull
+
+require() {
+    command -v "$1" 1>/dev/null || { >&2 echo "Error: $1 is not installed";exit 1; }
+}
+
+[[ -z $NOTION_TOKEN ]] && >&2 echo "NOTION_TOKEN must be exported" && exit 1
+[[ -z $NOTION_SPACE_ID ]] && >&2 echo "NOTION_SPACE_ID must be exported" && exit 1
+
+require http
+require jq
+require 7z
+
+task_id=$(http https://www.notion.so/api/v3/enqueueTask "Cookie:token_v2=${NOTION_TOKEN}" task:='{"eventName":"exportSpace","request":{"spaceId":"'${NOTION_SPACE_ID}'","exportOptions":{"exportType":"markdown","timeZone":"Asia/Kolkata","locale":"en"}}}' | jq '.taskId') || exit $?
+
+max_wait=60
+wait_rem=$max_wait
+while ((wait_rem--)); do
+    resp=$(http https://www.notion.so/api/v3/getTasks "Cookie:token_v2=${NOTION_TOKEN}" taskIds:=[$task_id]) || exit $?
+    if [[ $(jq '.results[0].state' <<< "$resp") == '"success"' ]]; then
+        http $(jq '.results[0].status.exportURL' <<< "$resp" | sed 's/^"\(.*\)"$/\1/') "Cookie:token_v2=${NOTION_TOKEN}" -o /tmp/notion-export.zip \
+        && 7z x /tmp/notion-export.zip \
+        && rm /tmp/notion-export.zip
+
+        exit $?
+    fi
+    sleep 1
+done
+
+echo "Tried for $max_wait seconds and it did not provide a download!"
+exit 255

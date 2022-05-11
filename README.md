@@ -41,6 +41,7 @@ main                           The Main (Actual) scripts for productivity
 ├─ cross-chroot                   A simple script to automate installation of dependencies and enable cross-chroot environment
 ├─ extarrange                     Arranges the files by grouping them into folder of their extension name
 ├─ git-tree                       Prints out tree of yadm/git tracked files
+├─ notion-export                  Exports whole notion workspace in $PWD
 ├─ pwd-launch                     Finds and appends pwd of currently focused window using EWMH to the given command
 ├─ reboot-firmware                Reboots into BIOS/UEFI firmware setup
 ├─ rti-download                   QuickMulti RTI Downloader
