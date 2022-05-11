@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Uploads a file streamed from a web URL
+
+url="$1"
+file="/tmp/$(sed 's/[:/\.]/_/g' <<< $url).fifo"
+
+reset() {
+    [ -p "$file" -o -f "$file" ] && rm "$file"
+}
+trap reset SIGINT
+trap reset SIGTERM
+
+reset
+mkfifo "$file"
+echo "$file" | xclip -sel clip
+curl -L "$url" -o "$file" -s
+echo -n "" | xclip -sel clip
+reset
