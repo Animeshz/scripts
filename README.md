@@ -33,6 +33,7 @@ acpi                           Scripts for handling acpi events from /etc/acpi/h
 
 bootstrapping                  Bootstrapping Scripts
 ├─ crusersv                       Creates user sv dir in ~/.local/service (preferably symlinking user services from ~/.config/sv)
+├─ crxinit                        Creates xinit desktop entry for starting from a display manager
 ├─ gen-monitor-dpi                Generates correct dpi for the screen, outputs in format of /etc/X11/xorg.conf.d
 └─ rpi-repeater                   Setup raspberry pi as a wifi-repeater (Ext-Dongle: client, Inbuilt: AP)
 

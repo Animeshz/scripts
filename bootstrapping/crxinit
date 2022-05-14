@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Creates xinit desktop entry for starting from a display manager
+
+if [ "$1" = '-d' ]; then
+    XINIT=${2:-$XINIT}
+    desktop_entry="$(basename $XINIT | sed 's/^.//')"
+    sudo rm "/usr/share/xsessions/$desktop_entry.desktop"
+    exit
+fi
+
+XINIT=${1:-$XINIT}
+XINIT=$(realpath $XINIT)
+sudo chmod +x "$XINIT"
+
+desktop_entry="$(basename $XINIT | sed 's/^.//')"
+mkdir -p "/usr/share/xsessions"
+
+cat <<EOL | sudo dd of="/usr/share/xsessions/$desktop_entry.desktop"
+[Desktop Entry]
+Name=$desktop_entry
+Comment=Executes the $XINIT script
+TryExec=$XINIT
+Exec=$XINIT
+Type=Application
+EOL
+
