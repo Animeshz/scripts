@@ -21,8 +21,8 @@ wait_rem=$max_wait
 while ((wait_rem--)); do
     resp=$(http https://www.notion.so/api/v3/getTasks "Cookie:token_v2=${NOTION_TOKEN}" taskIds:=[$task_id]) || exit $?
     if [[ $(jq '.results[0].state' <<< "$resp") == '"success"' ]]; then
-        http $(jq '.results[0].status.exportURL' <<< "$resp" | sed 's/^"\(.*\)"$/\1/') "Cookie:token_v2=${NOTION_TOKEN}" -o /tmp/notion-export.zip \
-        && 7z x /tmp/notion-export.zip \
+        http $(jq '.results[0].status.exportURL' <<< "$resp" | sed 's/^"\(.*\)"$/\1/') "Cookie:token_v2=${NOTION_TOKEN}" -d -o /tmp/notion-export.zip \
+        && 7z x -y /tmp/notion-export.zip \
         && rm /tmp/notion-export.zip
 
         exit $?
