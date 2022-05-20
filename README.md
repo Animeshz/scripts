@@ -50,7 +50,7 @@ main                           The Main (Actual) scripts for productivity
 
 snips                          Snippets that mainly delegates the operation to other applicaitons/scripts in one-line, but used regularly.
 ├─ color                          TODO: Extend script as filter, and with string name inputs like 'blue'
-├─ dirdiff                        Shows file only in first dir and not in other
+├─ dirdiff                        Shows file only in first dir and not in other, along with options [-c|-s] for content/symmetric difference
 ├─ git-cloc                       Counts lines of code in a git repository
 ├─ installed-packages             Shows list of manually installed packages sorted by name (default) or date (-d) of installation
 ├─ ocr                            Copies the text from anywhere on the screen to clipboard using tesseract-ocr
