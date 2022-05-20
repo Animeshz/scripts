@@ -8,8 +8,20 @@ require() {
 
 require fd
 
+if [ $1 = '-s' ]; then SYMMETRIC_DIFF=1; shift; fi
+if [ $1 = '-c' ]; then CONTENT_DIFF=1; shift; fi
+
 a=$(realpath $1)
 b=$(realpath $2)
 
 cd "$a"
-fd -x sh -c "[ -e '$b/{}' ] || echo {}" 2>/dev/null
+
+if [ "${CONTENT_DIFF:-0}" -eq 1 ]; then
+    fd -x sh -c "cmp $a/{} $b/{} >/dev/null 2>&1 || echo \$(echo {} | sed 's/^\.\///')" 2>/dev/null
+    exit
+fi
+
+fd -x sh -c "[ -e '$b/{}' ] || echo $1/\$(echo {} | sed 's/^\.\///')" 2>/dev/null
+if [ "${SYMMETRIC_DIFF:-0}" -eq 1 ]; then
+    cd - >/dev/null && $0 $2 $1
+fi

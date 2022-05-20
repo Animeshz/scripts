@@ -7,4 +7,17 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-TERM=linux xchroot "$(realpath "$1")" $2
+command -v xhost >/dev/null && xhost || { >&2 echo "xhost not installed, GUI forwarding and system clipboard won't work"; }
+
+root_path="$(realpath "$1")"
+xauth_path="$root_path/root/.Xauthority"
+x11_socket_path="$root_path/tmp/.X11-unix"
+user=$(stat -c '%U' "$0") || exit_with_failure
+user_home=$(cat /etc/passwd | awk "/^$user:/" | cut -d: -f6)
+
+touch "$xauth_path" && mount --bind "$user_home/.Xauthority" "$xauth_path"
+touch "$x11_socket_path" && mount --bind /tmp/.X11-unix "$x11_socket_path"
+
+TERM=linux XAUTHORITY="/root/.Xauthority" xchroot "$root_path" $2
+
+umount -R "$xauth_path" "$x11_socket_path"
