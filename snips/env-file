@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Creates a virtual file which can only be read once with contents coming from given env variable
+# Caution: If file is not read or removed, scripts goes into deadlock in background and must be killed manually
+
+if [[ $# -ne 2 ]]; then
+    >&2 echo "Usage: $(basename $0) <env-name> <file-path>"
+    >&2 echo "  Reads <env-name> into <file-path>, once file is read deletes it"
+    >&2 echo "Caution: If file is not read or removed, scripts goes into deadlock in background and must be killed manually"
+fi
+
+filename="$2"
+mkfifo "$filename" || exit
+echo "${!1}" > "$filename" && rm "$filename" &
