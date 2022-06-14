@@ -20,7 +20,7 @@ nvim {.bashrc,.zshrc,.config/fish/config.fish}
 [show-scripts](https://github.com/Animeshz/scripts/blob/main/show-scripts)
 
 ```
-acpi                           Scripts for handling acpi events from /etc/acpi/handler.sh
+acpi/                          Scripts for handling acpi events from /etc/acpi/handler.sh
 ├─ bridn                          Down the brightness by given value or else 2
 ├─ briup                          Up the brightness by given value or else 2
 ├─ munxt                          Emits a generic event to move to next song/video using playerctl
@@ -31,13 +31,14 @@ acpi                           Scripts for handling acpi events from /etc/acpi/h
 ├─ voldn                          Up the vol by given value or else 2
 └─ volup                          Down the vol by given value or else 2
 
-bootstrapping                  Bootstrapping Scripts
+bootstrapping/                 Bootstrapping Scripts
 ├─ crusersv                       Creates user sv dir in ~/.local/service (preferably symlinking user services from ~/.config/sv)
 ├─ crxinit                        Creates xinit desktop entry for starting from a display manager
 ├─ gen-monitor-dpi                Generates correct dpi for the screen, outputs in format of /etc/X11/xorg.conf.d
-└─ rpi-repeater                   Setup raspberry pi as a wifi-repeater (Ext-Dongle: client, Inbuilt: AP)
+├─ rpi-repeater                   Setup raspberry pi as a wifi-repeater (Ext-Dongle: client, Inbuilt: AP)
+└─ rpi-void                       Bootstraps the void's rootfs for the raspberry pi 3
 
-main                           The Main (Actual) scripts for productivity
+main/                          The Main (Actual) scripts for productivity
 ├─ active-window-pid              Finds pid of currently focused window using EWMH
 ├─ cross-chroot                   A simple script to automate installation of dependencies and enable cross-chroot environment
 ├─ extarrange                     Arranges the files by grouping them into folder of their extension name
@@ -48,7 +49,7 @@ main                           The Main (Actual) scripts for productivity
 ├─ rti-download                   QuickMulti RTI Downloader
 └─ styler                         Styles the text to different styles (like superscript), run with --help to know more
 
-snips                          Snippets that mainly delegates the operation to other applicaitons/scripts in one-line, but used regularly.
+snips/                         Snippets that mainly delegates the operation to other applicaitons/scripts in one-line, but used regularly.
 ├─ color                          TODO: Extend script as filter, and with string name inputs like 'blue'
 ├─ dirdiff                        Shows file only in first dir and not in other, along with options [-c|-s] for content/symmetric difference
 ├─ git-cloc                       Counts lines of code in a git repository

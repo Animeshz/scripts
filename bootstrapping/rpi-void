@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# Bootstraps the void's rootfs for the raspberry pi 3
+
+if [[ $EUID -ne 0 ]]; then
+  >&2 echo "This script must be run as root"
+  exit 1
+fi
+
+usage() {
+  >&2 echo "$1"
+  >&2 echo "Usage: $(basename $0) <disk-name> [platformfs-file-path]"
+  >&2 echo "ENV: MKLIVE_PATH  - Points to already existing void-mklive clone"
+  >&2 echo ""
+  >&2 echo "Example: $(basename $0) /dev/sda"
+  exit 1
+}
+
+disk=$(basename $1) || usage "Unknown device: $1"
+[[ -b /dev/$disk && $(stat -c "%Lr" /dev/$disk) == '0' ]] || usage "Unknown device: $1"
+
+# 100M vfat (0c) + REST_OF_DISK ext4 (83)
+printf '%s\n' o n p 1 '' +100M a n p 2 '' '' t 1 c t 2 83 w | fdisk /dev/$disk --wipe always
+sync && sleep 1
+
+read boot boot_uuid <<< "$(lsblk -ro NAME,FSTYPE,PARTUUID | grep $disk | grep vfat | tr -s ' ' | cut -d' ' -f1,3)"
+read root root_uuid <<< "$(lsblk -ro NAME,FSTYPE,PARTUUID | grep $disk | grep ext4 | tr -s ' ' | cut -d' ' -f1,3)"
+
+echo "Partitions created:"
+echo $boot $boot_uuid
+echo $root $root_uuid
+echo
+
+yes | mkfs.vfat /dev/$boot
+yes | mkfs.ext4 -O ^has_journal /dev/$root
+
+platformfs_file="$2"
+if [[ ! -f "$platformfs_file" ]]; then
+    platformfs_file="void-rpi3-PLATFORMFS-$(date '+%Y%m%d').tar.xz"
+fi
+
+if [[ ! -f "$platformfs_file" ]]; then
+    [[ -d "$MKLIVE_PATH" ]] && cd $MKLIVE_PATH || git clone https://github.com/void-linux/void-mklive && cd void-mklive
+
+    # Use void-mklive to build this (disable binfmt-support while doing so).
+    xbps-install -Sy xbps
+    xbps-install -Sy bash findutils which util-linux git make kmod qemu-user-static tar xz
+    ./mkrootfs.sh aarch64
+    ./mkplatformfs.sh -p 'bash fish-shell neovim' rpi3 void-aarch64-ROOTFS-$(date '+%Y%m%d').tar.xz
+fi
+
+mkdir -p /mnt/rpi
+mount /dev/$root /mnt/rpi
+mkdir -p /mnt/rpi/boot
+mount /dev/$boot /mnt/rpi/boot
+
+tar xvfp "$platformfs_file" -C /mnt/rpi 1>/dev/null
+echo "Successfully extracted $platformfs_file to /mnt/rpi"
+
+{
+    echo "# proc  /proc proc defaults 0 0"
+    echo "PARTUUID=$boot_uuid /boot vfat defaults 0 0"
+    echo "PARTUUID=$root_uuid /     ext4 defaults 0 0"
+} > /mnt/rpi/etc/fstab
+
+umount -R /mnt/rpi
