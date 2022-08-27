@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Setups cross-architecture chroots
+
+if [[ $EUID -ne 0 ]]; then
+  >&2 echo "This script must be run as root"
+  exit 1
+fi
+
+if [[ ! -x ~/.cache/qemu-users-static/qemu-binfmt-conf.sh ]]; then
+    mkdir -p ~/.cache/qemu-users-static
+    wget https://github.com/qemu/qemu/raw/master/scripts/qemu-binfmt-conf.sh -O ~/.cache/qemu-users-static/qemu-binfmt-conf.sh 2>/dev/null
+    chmod +x ~/.cache/qemu-users-static/qemu-binfmt-conf.sh
+fi
+if [[ ! -f /proc/sys/fs/binfmt_misc/register ]]; then
+    mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
+fi
+
+if [[ "$1" = "--register" ]]; then
+    /usr/share/qemu-user-static/scripts/qemu-binfmt-conf.sh --qemu-suffix "-static" \
+        --qemu-path /usr/bin -c yes -p yes
+elif [[ "$1" = "--unregister" ]]; then
+    for i in /proc/sys/fs/binfmt_misc/qemu-*; do
+        echo -1 > $i
+    done
+else
+  >&2 echo "Unknown option: $1"
+  >&2 echo ""
+  >&2 echo "Usage:"
+  >&2 echo "  $(basename $0) --register|--unregister"
+fi

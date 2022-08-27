@@ -2,9 +2,9 @@
 
 if pstree -s $$ | grep -q kitty; then
     kitty @ set-spacing padding=0
-    $@
+    "$@"
     kitty @ set-spacing padding=15
 else
-    $@
+    "$@"
 fi
 
