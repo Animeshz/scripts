@@ -17,14 +17,9 @@ pid_script="${0%/*}/active-window-pid"
 [[ -x "$pid_script" ]] || fallback
 pid=$($pid_script) || fallback
 
-child_pid="$pid"
-child_procs=$(pgrep -P "$pid")
-if [[ $(wc -l <<< "$child_procs") -eq 1 ]]; then
-    child_pid="$child_procs"
-fi
+child_pid=$(pgrep -P "$pid" | tail -n1)
 
 [[ -z "$child_pid" ]] && fallback
-
 child_pwd=$(readlink -f "/proc/$child_pid/cwd") || fallback
 
 exec "$@" "$child_pwd"

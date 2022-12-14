@@ -72,11 +72,11 @@ fi
   while read line; do
     for (( i=0; i<${#line}; i++ )); do
       char="${line:$i:1}"
-      charcode=${ord[$char]}
+      charcode=${ord["$char"]}
 
       # Faster to just echo than to store it in result variable and concat at each step
       if (( charcode > 32 && charcode < 127 )); then
-        echo -n ${unicode:$((charcode-33)):1}
+        echo -n "${unicode:$((charcode-33)):1}"
       else
         echo -n "$char"
       fi

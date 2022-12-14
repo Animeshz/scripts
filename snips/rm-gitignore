@@ -1,0 +1,9 @@
+#!/bin/sh
+
+git_repos=$(find . -name .git -type d -prune)
+
+for repo in $git_repos; do
+    cd $repo/.. 1>/dev/null
+    git clean -xdf  # -xdn (dry-run)
+    cd - 1>/dev/null
+done
