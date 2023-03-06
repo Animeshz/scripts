@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# TODO: Extend script as filter, and with string name inputs like 'blue'
-# Ref: https://github.com/ricobl/dotfiles/blob/master/bin/mass-git
-
 # E.g: color magenta && echo hello && color reset
+# Ref: https://github.com/ricobl/dotfiles/blob/master/bin/mass-git
 
 ##################
 # Code # Color   #

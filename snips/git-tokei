@@ -8,10 +8,10 @@ require() {
 }
 
 require git
-require cloc
+require tokei
 
 git clone --depth 1 "$1" /tmp/temp-linecount-repo &&
   printf "('/tmp/temp-linecount-repo' will be deleted automatically)\n\n\n" &&
-  cloc /tmp/temp-linecount-repo &&
+  tokei /tmp/temp-linecount-repo &&
   rm -rf /tmp/temp-linecount-repo
 
