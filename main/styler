@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 # Styles the text to different styles (like superscript), run with --help to know more
+#
+# Maybe adapt to more styles (references below):
+# https://github.com/codebytere/unicode-cli-converter
+# https://github.com/DenverCoder1/unicode-formatter
+# https://github.com/lynn9388/supsub
+# https://discord.com/channels/635612648934735892/635625925748457482/884795856895741982
 
 declare -A unicodes=(
   # fixup indexing, few symbols missing...

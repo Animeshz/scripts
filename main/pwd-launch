@@ -15,11 +15,11 @@ require_or_fallback readlink
 
 pid_script="${0%/*}/active-window-pid"
 [[ -x "$pid_script" ]] || fallback
-pid=$($pid_script) || fallback
+
+pid=$($pid_script)
+[[ -n "$pid" ]] || fallback
 
 child_pid=$(pgrep -P "$pid" | tail -n1)
-
-[[ -z "$child_pid" ]] && fallback
-child_pwd=$(readlink -f "/proc/$child_pid/cwd") || fallback
+[[ -n "$child_pid" ]] && child_pwd=$(readlink -f "/proc/$child_pid/cwd") || child_pwd=$(readlink -f "/proc/$pid/cwd") || fallback
 
 exec "$@" "$child_pwd"
