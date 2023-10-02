@@ -3,22 +3,22 @@
 ### No need to memorize numerous commands for executing and compiling code in various programming languages.
 ### Just provide the programming file as an argument to this script. 
 
-file=$1;
-no_extension=${file%.*}
+file="$1";
+no_extension="${file%.*}"
 if [[ "$file" == *.cpp || "$file" == *.c ]];
 then
-    make $no_extension
-    ./$no_extension
+    make "$no_extension"
+    ./"$no_extension"
 elif [[ "$file" == *.java ]];
 then
-  javac $file;
-  java $no_extension;
+  javac "$file";
+  java "$no_extension";
 elif [[ "$file" == *.py ]];
 then
-  python $file;
+  python "$file";
 elif [[ "$file" == *.sh ]];
 then
-  bash $file;
+  bash "$file";
 else
   echo "Unable to compile this file format!";
 fi
