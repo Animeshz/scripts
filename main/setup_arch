@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+# Run command chmod 'u+x script_name' or 'chmod 776 script_name' for assinging execute permission to the script.
+# Then execute the script by running command 'bash script_name' or './script_name'.
+# You can add or remove packages according to your choice from the script.
+
+echo "=============================================================================================================";
+echo "                                Setup for the system will begin shortly!";
+echo "=============================================================================================================";
+sleep 2s;
+sudo pacman -Sy --noconfirm --needed base-devel git
+xrandr -r 60
+sudo systemctl enable fstrim.timer
+sudo systemctl enable --now bluetooth.service
+git clone https://aur.archlinux.org/paru-bin.git
+cd paru-bin
+makepkg -si
+cd ..
+rm -rf paru-bin
+paru -Syu kitty fish starship nushell linux-wifi-hotspot yt-dlp neovim brave-bin google-chrome noto-fonts-emoji nerd-fonts-source-code-pro ttf-cascadia-code-nerd vlc ripgrep fd exa bandwhich konsave gparted visual-studio-code-bin jdk-openjdk telegram-desktop-bin dust flameshot tree moreutils sct ranger xclip make ;
+chsh -s /bin/fish
+echo "=============================================================================================================";
+echo "                               Setup completed! Now enjoy with your Computer."; 
+echo "=============================================================================================================";
