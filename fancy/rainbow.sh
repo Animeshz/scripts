@@ -37,5 +37,5 @@ main() {
     echo "Rainbow has been drawn!"
 }
 
-# Call the main function
+# Calling the main function
 main

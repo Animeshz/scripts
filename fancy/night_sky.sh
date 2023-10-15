@@ -31,5 +31,6 @@ main() {
     tput cup $(tput lines) 0
 }
 
-# Call the main function
+# Calling the main function
 main
+
