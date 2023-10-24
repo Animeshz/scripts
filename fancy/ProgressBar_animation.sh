@@ -1,60 +1,38 @@
 #!/bin/bash
 
-# Define an array of spinner characters
-spinner=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
-
-# Define colors using ANSI escape codes
-green='\e[32m'
-blue='\e[34m'
-reset='\e[0m'
-
-# Function to display a waiting animation with colors
-display_waiting_animation() {
-    local delay=0.1
-    local i=0
-
-    while true; do
-        echo -n -e "\r[${green}${spinner[i]}${reset}] ${blue}Loading...${reset}   "
-        i=$(( (i + 1) % ${#spinner[@]} ))
-        sleep $delay
-    done
-}
-
-# Function to display a progress bar
+# Function to display a progress bar animation
 display_progress_bar() {
-    local duration=$1
-    local progress=0
     local width=50
+    local duration=$1
 
-    while [ $progress -lt 100 ]; do
-        progress=$((progress + 2))
-        completed=$((progress * width / 100))
+    for ((i = 0; i <= width; i++)); do
+        percentage=$((i * 2))
+        completed=$((i * width / 100))
         remaining=$((width - completed))
-        echo -ne "\r[${green}${spinner[$((progress % ${#spinner[@]}))]}${reset}] ${blue}Progress: [${green}"
-        for ((i = 0; i < completed; i++)); do
+        
+        # Print the progress bar
+        echo -ne "\r["
+        for ((j = 0; j < completed; j++)); do
             echo -n "="
         done
-        for ((i = 0; i < remaining; i++)); do
+        for ((j = 0; j < remaining; j++)); do
             echo -n " "
         done
-        echo -ne "] ${progress}%${reset}"
+        echo -ne "] $percentage%"
+        
+        # Sleep for a short duration to create animation effect
         sleep "$duration"
     done
+
+    # Print a newline character to clear the progress bar line
+    echo
 }
 
 # Main function
 main() {
-    # Start the waiting animation in the background
-    display_waiting_animation &
-
-    # Simulate some work with a progress bar
+    echo "Starting the task..."
     display_progress_bar 0.1
-
-    # Stop the waiting animation by killing its background process
-    kill $!
-
-    # Clear the line after the animation is done
-    echo -e "\r\033[K${green}Done!${reset}"
+    echo "Task completed!"
 }
 
 # Calling the main function
