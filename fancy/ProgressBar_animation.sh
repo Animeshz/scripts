@@ -16,7 +16,7 @@ display_progress_bar() {
             echo -n "="
         done
         for ((j = 0; j < remaining; j++)); do
-            echo -n " "
+            echo -n ""
         done
         echo -ne "] $percentage%"
         
