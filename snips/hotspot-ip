@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Find hotspot's ip address, along with my own ip
+
+ip -4 route get 8.8.8.8 | grep via
